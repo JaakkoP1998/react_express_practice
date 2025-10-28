@@ -76,7 +76,16 @@ app.post('/api/comments', (request, response) => {
     response.json(note)
 })
 
+// This part is for running server locally
+/*
 const PORT = 3001
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
+*/
+
+// This part is for running server in Render: https://render.com/
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
