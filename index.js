@@ -5,8 +5,10 @@ const cors = require('cors')
 
 app.use(express.json())
 app.use(cors())
+app.use(express.static('dist'))
 
 // Some json-notes for testing
+// TODO: make so that these comments are maintained in proper database.
 let notes = [  
     {    
         id: "1",    
