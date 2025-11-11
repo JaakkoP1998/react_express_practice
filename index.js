@@ -7,22 +7,22 @@ app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
 
-// Some json-notes for testing
-// TODO: make so that these comments are maintained in proper database.
-let notes = [  
-    {    
-        id: "1",    
-        content: "These are comments meant for testing web-application",    
-    },  
-    {    
-        id: "2",    
-        content: "Some features may not be yet applied",    
-    },  
-    {    
-        id: "3",    
-        content: "Works as a back-end for https://github.com/JaakkoP1998/react_harjoittelua",    
-    }
-]
+const mongoose = require('mongoose')
+
+
+// Connect to a MongoDB atlas database,
+// password is given from command promt.
+const password = process.argv[2]
+const url = `mongodb+srv://jaakkop1998_db_user:${password}@cluster0.4rgkdh5.mongodb.net/?appName=Cluster0`
+
+mongoose.set('strictQuery',false)
+mongoose.connect(url, { family: 4 })
+
+const commentSchema = new mongoose.Schema({
+  content: String,
+})
+
+const Comment = mongoose.model('Comment', commentSchema)
 
 // Webserver is created by using Express.
 // Local main address for server is http://localhost:3001/
@@ -30,13 +30,17 @@ app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
 
-// "http://localhost:3001/api/comments/" to see json-data.
+// /api/comments/ to see json-data.
 app.get('/api/comments', (request, response) => {
-  response.json(notes)
+  Comment.find({}).then(comments => {
+    response.json(comments)
+  })
 })
 
+// TODO: work following to use MongoDB.
 // Get note by id.
 // For example "http://localhost:3001/api/notes/1" shows note matching id number 1. 
+/*
 app.get('/api/comments/:id', (request, response) => {
   const id = request.params.id
   const note = notes.find(note => note.id === id)
@@ -48,48 +52,50 @@ app.get('/api/comments/:id', (request, response) => {
     response.status(404).end()  
   }
 })
-
+ */
 // Helper function to generate new id based on notes.length
+/* 
 const generateId = () => {
   const maxId = notes.length > 0
     ? Math.max(...notes.map(n => Number(n.id)))
     : 0
   return String(maxId + 1)
-}
+} */
 
 // Method for adding new notes.
 app.post('/api/comments', (request, response) => {  
-    const body = request.body
+  const body = request.body
 
-    // Content-field is not allowed to be empty.
-    if (!body.content) {
-        return response.status(400).json({ 
-            error: 'content missing' 
-        })
-    }
-    
-    const note = {
-        content: body.content,
-        id: generateId(),
-    }
+  if (!body.content) {
+    return response.status(400).json({ error: 'content missing' })
+  }
 
-    notes = notes.concat(note)
-
-    response.json(note)
+  const comment = new Comment({
+    content: body.content,
+  })
+  
+  comment.save()
+    .then(savedComment => {
+      console.log('Comment saved!')
+      response.status(201).json(savedComment)
+    })
+    .catch(error => {
+      console.error(error)
+      response.status(500).json({ error: 'failed to save comment' })
+    })
 })
 
 // This part is for running server locally
-/*
 const PORT = 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
-*/
+
 
 // This part is for running server in Render: https://render.com/
 // Check to see that the server is working:
 // https://react-express-practice.onrender.com/api/comments
-const PORT = process.env.PORT || 3001
+/* const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
-})
+}) */
