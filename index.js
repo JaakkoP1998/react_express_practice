@@ -1,28 +1,13 @@
+require('dotenv').config()
 const express = require('express')
+const Comment = require('./models/comment')
+
 const app = express()
 const cors = require('cors')
-
 
 app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
-
-const mongoose = require('mongoose')
-
-
-// Connect to a MongoDB atlas database,
-// password is given from command promt.
-const password = process.argv[2]
-const url = `mongodb+srv://jaakkop1998_db_user:${password}@cluster0.4rgkdh5.mongodb.net/?appName=Cluster0`
-
-mongoose.set('strictQuery',false)
-mongoose.connect(url, { family: 4 })
-
-const commentSchema = new mongoose.Schema({
-  content: String,
-})
-
-const Comment = mongoose.model('Comment', commentSchema)
 
 // Webserver is created by using Express.
 // Local main address for server is http://localhost:3001/
@@ -52,15 +37,7 @@ app.get('/api/comments/:id', (request, response) => {
     response.status(404).end()  
   }
 })
- */
-// Helper function to generate new id based on notes.length
-/* 
-const generateId = () => {
-  const maxId = notes.length > 0
-    ? Math.max(...notes.map(n => Number(n.id)))
-    : 0
-  return String(maxId + 1)
-} */
+*/
 
 // Method for adding new notes.
 app.post('/api/comments', (request, response) => {  
