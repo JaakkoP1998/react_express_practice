@@ -3,10 +3,12 @@ const express = require('express')
 const Comment = require('./models/comment')
 
 const app = express()
-const cors = require('cors')
+// Remove cors from use when using Render-version.
+// Can be usefull in local testing.
+//const cors = require('cors')
 
 app.use(express.json())
-app.use(cors())
+//app.use(cors())
 app.use(express.static('dist'))
 
 // Webserver is created by using Express.
@@ -15,16 +17,15 @@ app.get('/', (request, response) => {
   response.send('<h1>Hello World!</h1>')
 })
 
-// /api/comments/ to see json-data.
+// <baseUrl>/api/comments/ to see json-data.
 app.get('/api/comments', (request, response) => {
   Comment.find({}).then(comments => {
     response.json(comments)
   })
 })
 
-// TODO: work following to use MongoDB.
-// Get note by id.
-// For example "http://localhost:3001/api/notes/1" shows note matching id number 1. 
+// TODO: Does not work in current application, modify following to use MongoDB.
+// Gets notes by their id.
 /*
 app.get('/api/comments/:id', (request, response) => {
   const id = request.params.id
@@ -47,6 +48,7 @@ app.post('/api/comments', (request, response) => {
     return response.status(400).json({ error: 'content missing' })
   }
 
+  // Constructor for Comment-object.
   const comment = new Comment({
     content: body.content,
   })
@@ -71,7 +73,7 @@ app.listen(PORT, () => {
 
 // This part is for running server in Render: https://render.com/
 // Check to see that the server is working:
-// https://react-express-practice.onrender.com/api/comments
+// https://react-express-practice.onrender.com/
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
