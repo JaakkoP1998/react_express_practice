@@ -1,6 +1,8 @@
 const commentsRouter = require('express').Router()
 const { request } = require('express')
 const Comment = require('../models/comment')
+// Every comment needs reference to user that posted the comment.
+const User = require('../models/user')
 
 // Controller-file for handling routes for comments.
 
@@ -30,8 +32,14 @@ Comment.findById(request.params.id)
 })
 
 // Method for adding new notes.
-commentsRouter.post('/', (request, response) => {  
+commentsRouter.post('/', async (request, response) => {  
   const body = request.body
+
+  const user = await User.findById(body.userId)
+
+  if (!user) {
+    return response.status(400).json({ error: 'userId missing or not valid' })
+  }
 
   if (!body.content) {
     return response.status(400).json({ error: 'content missing' })
@@ -40,19 +48,14 @@ commentsRouter.post('/', (request, response) => {
   // Constructor for Comment-object.
   const comment = new Comment({
     content: body.content,
+    user: user._id
   })
   
   // Save comment to Mongo.
-  // Sends 500 error if failed to save.
-  comment.save()
-    .then(savedComment => {
-      console.log('Comment saved!')
-      response.status(201).json(savedComment)
-    })
-    .catch(error => {
-      console.error(error)
-      response.status(500).json({ error: 'failed to save the comment' })
-    })
+  // Add reference to user, who posted the comment
+  await comment.save()
+  user.notes = user.notes.concat(savedNote._id)
+  await user.save()
 })
 
 // Method to delete comments.

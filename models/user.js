@@ -3,7 +3,11 @@ const mongoose = require('mongoose')
 // Schema for user-profile
 // Note: no email verification yet, so dont make too complicated passwords.
 const userSchema = mongoose.Schema({
-  username: String,
+  username: {
+    type: String,
+    required: true,
+    unique: true
+  },
   name: String,
   passwordHash: String,
   // Comment id:s are saved in user's profile
@@ -21,7 +25,6 @@ userSchema.set('toJSON', {
     returnedObject.id = returnedObject._id.toString()
     delete returnedObject._id
     delete returnedObject.__v
-    // The passwordHash should not be revealed
     delete returnedObject.passwordHash
   }
 })

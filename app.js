@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const mongoose = require('mongoose')
 const commentsRouter = require('./controllers/comments')
+const usersRouter = require('./controllers/users')
 
 // File for main application.
 
@@ -16,6 +17,7 @@ app.use(cors())
 // URL for connecting to Mongo-database
 const url = process.env.MONGODB_URI
 
+// Connect to Mongo database, print error if not success.
 mongoose
   .connect(url, { family: 4 })
   .then(() => {
@@ -29,5 +31,6 @@ app.use(express.static('dist'))
 app.use(express.json())
 
 app.use('/api/comments', commentsRouter)
+app.use('/api/users', usersRouter)
 
 module.exports = app
