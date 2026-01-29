@@ -51,11 +51,13 @@ commentsRouter.post('/', async (request, response) => {
     user: user._id
   })
   
-  // Save comment to Mongo.
-  // Add reference to user, who posted the comment
-  await comment.save()
-  user.notes = user.notes.concat(savedNote._id)
+  // Save comment to Mongo and add reference to user, who posted the comment
+  const savedComment = await comment.save()
+  user.comments = user.comments.concat(savedComment._id)
   await user.save()
+
+  // Send 201 success when comment is saved.
+  response.status(201).json(savedComment)
 })
 
 // Method to delete comments.
