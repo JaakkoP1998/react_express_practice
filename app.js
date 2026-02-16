@@ -3,6 +3,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const commentsRouter = require('./controllers/comments')
 const usersRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
 
 // File for main application.
 
@@ -30,7 +31,9 @@ mongoose
 app.use(express.static('dist'))
 app.use(express.json())
 
+// Enable all controller files.
 app.use('/api/comments', commentsRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 
 module.exports = app

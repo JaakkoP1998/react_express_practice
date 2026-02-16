@@ -1,0 +1,2 @@
+// This file is for testing API-calls through VS Code REST client.
+get http://localhost:3001/api/users
