@@ -3,8 +3,19 @@ const { request } = require('express')
 const Comment = require('../models/comment')
 // Every comment needs reference to user that posted the comment.
 const User = require('../models/user')
+// Library for login tokens.
+const jwt = require('jsonwebtoken')
 
 // Controller-file for handling routes for comments.
+
+// Helper function for getting the token from send request.
+const getTokenFrom = request => {
+  const authorization = request.get('authorization')
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '')
+  }
+  return null
+}
 
 // Method for getting all the comments in json-object.
 commentsRouter.get('/', (request, response) => {
@@ -31,16 +42,23 @@ Comment.findById(request.params.id)
     })
 })
 
-// Method for adding new notes.
+// Method for adding new comments.
 commentsRouter.post('/', async (request, response) => {  
   const body = request.body
 
-  const user = await User.findById(body.userId)
+  // Decode given token and send error if corresponding user is not found.
+  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  // Reference to matching user.
+  const user = await User.findById(decodedToken.id)
 
   if (!user) {
     return response.status(400).json({ error: 'userId missing or not valid' })
   }
 
+  // Send error if comment is empty.
   if (!body.content) {
     return response.status(400).json({ error: 'content missing' })
   }
