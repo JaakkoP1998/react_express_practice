@@ -7,7 +7,7 @@ const commentSchema = new mongoose.Schema({
   content: {
     type: String,
     required: true,
-    minlength: 5
+    minlength: 2
   },
   // Reference to user's id, who made the comment.
   user: {

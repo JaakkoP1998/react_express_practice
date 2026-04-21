@@ -45,9 +45,16 @@ Comment.findById(request.params.id)
 // Method for adding new comments.
 commentsRouter.post('/', async (request, response) => {  
   const body = request.body
+  
+  // Check if there is "authorization" in the request, i.e. is commenter logged in.
+  if(!request.get('authorization')){
+    // If no user was found return error
+    return response.status(401).json({ error: 'token invalid of missing' })
+  }
 
   // Decode given token and send error if corresponding user is not found.
   const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+
   if (!decodedToken.id) {
     return response.status(401).json({ error: 'token invalid' })
   }
